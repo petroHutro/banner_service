@@ -4,6 +4,6 @@ import (
 	"net/http"
 )
 
-func (h *Handler) Banner(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PostBanner(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }

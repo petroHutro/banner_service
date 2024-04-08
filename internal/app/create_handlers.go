@@ -22,7 +22,12 @@ func (a *App) createHandlers() {
 	a.router.Route("/banner", func(r chi.Router) {
 		r.With(authorization.AuthorizationMiddleware("")).
 			Get("/", func(w http.ResponseWriter, r *http.Request) {
-				a.handler.Banner(w, r)
+				a.handler.GetBanner(w, r)
+			})
+
+		r.With(authorization.AuthorizationMiddleware("")).
+			Post("/", func(w http.ResponseWriter, r *http.Request) {
+				a.handler.PostBanner(w, r)
 			})
 
 		r.With(authorization.AuthorizationMiddleware("")).
