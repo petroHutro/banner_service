@@ -3,6 +3,7 @@ package app
 import (
 	"banner_service/internal/config"
 	"banner_service/internal/handlers"
+	"banner_service/internal/logger"
 	"banner_service/internal/router"
 
 	"github.com/go-chi/chi/v5"
@@ -21,7 +22,7 @@ func newApp() (*App, error) {
 
 	handler := handlers.Init()
 
-	// logger.Info("Running server: address:%s port:%d", conf.Host, conf.Port)
+	logger.Info("Running server: address:%s port:%d", conf.Host, conf.Port)
 
 	return &App{
 		conf:    &conf,

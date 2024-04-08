@@ -2,13 +2,14 @@ package app
 
 import (
 	"banner_service/internal/authorization"
+	"banner_service/internal/logger"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 )
 
 func (a *App) createMiddlewareHandlers() {
-	// a.router.Use(logger.LoggingMiddleware)
+	a.router.Use(logger.LoggingMiddleware)
 }
 
 func (a *App) createHandlers() {

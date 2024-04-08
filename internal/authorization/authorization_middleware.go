@@ -1,6 +1,7 @@
 package authorization
 
 import (
+	"banner_service/internal/logger"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -38,13 +39,13 @@ func AuthorizationMiddleware(secretKey string) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie("Authorization")
 			if err != nil {
-				// logger.Error("cookies do not contain a token: %v", err)
+				logger.Error("cookies do not contain a token: %v", err)
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 			id, err := getUserID(secretKey, cookie.Value)
 			if err != nil {
-				// logger.Error("token does not pass validation")
+				logger.Error("token does not pass validation")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
