@@ -13,5 +13,13 @@ func NewFlags() Flags {
 			LoggerFileFlag:  false,
 			LoggerMultiFlag: false,
 		},
+
+		Storage: Storage{
+			DatabaseDSN: "host=localhost user=url password=1234 dbname=url sslmode=disable",
+		},
+
+		Caches: Caches{
+			Url: "redis://localhost:6379/0",
+		},
 	}
 }

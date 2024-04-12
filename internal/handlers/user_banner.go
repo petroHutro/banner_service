@@ -8,8 +8,9 @@ import (
 )
 
 type DataLogin struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
+	Tag      int  `json:"tag_id"`
+	Feature  int  `json:"feature_id"`
+	Revision bool `json:"use_last_revision"`
 }
 
 func (h *Handler) UserBanner(w http.ResponseWriter, r *http.Request) {

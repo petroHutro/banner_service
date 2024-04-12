@@ -28,6 +28,7 @@ func (w cacheWriter) Body() []byte {
 // the test piece
 func (c *Cache) CacheMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// проверить флаг
 		cachedData, err := c.Get(cacheKey(r))
 		if err == nil {
 			w.Write([]byte(cachedData))

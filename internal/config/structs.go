@@ -18,23 +18,19 @@ type NetAddress struct {
 	Port int
 }
 
-type ObjectStorage struct {
-	StorageAccessKey  string `json:"storageAccessKey"`
-	StorageSecretKey  string `json:"storageSecretKey"`
-	StorageEndpoint   string `json:"storageEndpoint"`
-	StorageBucketName string `json:"storageBucketName"`
-	StorageUseSSL     bool   `json:"storageUseSSL"`
-}
-
 type Storage struct {
 	DatabaseDSN string
-	ObjectStorage
+}
+
+type Caches struct {
+	Url string
 }
 
 type Flags struct {
 	Logger
 	NetAddress
 	Storage
+	Caches
 }
 
 func (a NetAddress) String() string {
