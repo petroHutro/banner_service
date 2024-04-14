@@ -1,6 +1,8 @@
 package app
 
 import (
+	"banner_service/internal/authorization"
+	"banner_service/internal/caches"
 	"banner_service/internal/config"
 	"banner_service/internal/handlers"
 	"banner_service/internal/logger"
@@ -12,30 +14,45 @@ import (
 )
 
 type App struct {
-	conf    *config.Flags
-	router  *chi.Mux
-	handler *handlers.Handler
-	storage storage.Storage
+	conf          *config.Flags
+	router        *chi.Mux
+	handler       *handlers.Handler
+	storage       storage.Storage
+	cache         *caches.Cache
+	authorization *authorization.Authorization
 }
 
 func newApp() (*App, error) {
 	conf := config.NewFlags()
 
-	router := router.CreateRouter()
+	if err := logger.Init(conf.Logger); err != nil {
+		return nil, fmt.Errorf("cannot init logger: %w", err)
+	}
 
-	handler := handlers.Init()
+	router := router.Init()
 
-	storage, err := storage.InitStorage(&conf.Storage)
+	storage, err := storage.Init(&conf.Storage)
 	if err != nil {
 		return nil, fmt.Errorf("cannot init storage: %w", err)
 	}
 
+	cache, err := caches.Init(conf.Url)
+	if err != nil {
+		return nil, fmt.Errorf("cannot init caches: %w", err)
+	}
+
+	authorization := authorization.Init(conf.TokenSecretKey)
+
+	handler := handlers.Init(storage, cache, authorization)
+
 	logger.Info("Running server: address:%s port:%d", conf.Host, conf.Port)
 
 	return &App{
-		conf:    &conf,
-		router:  router,
-		handler: handler,
-		storage: storage,
+		conf:          &conf,
+		router:        router,
+		handler:       handler,
+		storage:       storage,
+		cache:         cache,
+		authorization: authorization,
 	}, nil
 }
