@@ -42,7 +42,7 @@ func newMultiLogger(filePath string) (*zap.Logger, error) {
 	return logger, nil
 }
 
-func InitLogger(conf config.Logger) error {
+func Init(conf config.Logger) error {
 	if conf.LoggerMultiFlag {
 		logger, err := newMultiLogger(conf.LoggerFilePath)
 		if err != nil {
