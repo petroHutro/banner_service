@@ -4,18 +4,18 @@ import (
 	"banner_service/internal/logger"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/golang-jwt/jwt/v4"
 )
 
 type Claims struct {
 	jwt.RegisteredClaims
-	UserID int
+	Role string
 }
 
-func getUserID(secretKey, tokenString string) (int, error) {
+func getRole(secretKey, tokenString string) (string, error) {
 	claims := &Claims{}
+
 	token, err := jwt.ParseWithClaims(tokenString, claims,
 		func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -23,33 +23,37 @@ func getUserID(secretKey, tokenString string) (int, error) {
 			}
 			return []byte(secretKey), nil
 		})
+
 	if err != nil {
-		return 0, fmt.Errorf("cannot pars: %v", err)
+		return "", fmt.Errorf("cannot pars: %v", err)
 	}
 
 	if !token.Valid {
-		return 0, fmt.Errorf("token is not valid: %v", err)
+		return "", fmt.Errorf("token is not valid: %v", err)
 	}
 
-	return claims.UserID, nil
+	return claims.Role, nil
 }
 
-func AuthorizationMiddleware(secretKey string) func(http.Handler) http.Handler {
+// TO DO разграничить роли
+func (a *Authorization) AuthorizationMiddleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			cookie, err := r.Cookie("Authorization")
-			if err != nil {
-				logger.Error("cookies do not contain a token: %v", err)
+			token := r.Header.Get("token")
+			if token == "" {
+				logger.Error("Header do not contain a token")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			id, err := getUserID(secretKey, cookie.Value)
+
+			role, err := getRole(a.secretKey, token)
 			if err != nil {
 				logger.Error("token does not pass validation")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			r.Header.Set("User_id", strconv.Itoa(id))
+
+			r.Header.Set("role", role)
 
 			next.ServeHTTP(w, r)
 		})
