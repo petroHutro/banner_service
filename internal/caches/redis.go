@@ -17,7 +17,7 @@ func (c *Cache) Set(key string, value []byte, ttl time.Duration) error {
 }
 
 func (c *Cache) Get(key string) (string, error) {
-	return c.client.Do(context.Background(), c.client.B().Get().Key("k").Build()).ToString()
+	return c.client.Do(context.Background(), c.client.B().Get().Key(key).Build()).ToString()
 }
 
 func Init(url string) (*Cache, error) {

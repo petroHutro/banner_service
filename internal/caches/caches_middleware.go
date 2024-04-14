@@ -2,8 +2,9 @@ package caches
 
 import (
 	"banner_service/internal/logger"
-	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 )
 
@@ -25,26 +26,34 @@ func (w cacheWriter) Body() []byte {
 	return w.body
 }
 
-// the test piece
+func isLast(query url.Values) bool {
+	flag := query.Get("use_last_revision")
+
+	if strings.ToLower(flag) == "true" {
+		return false
+	}
+
+	return true
+}
+
 func (c *Cache) CacheMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// проверить флаг
-		cachedData, err := c.Get(cacheKey(r))
-		if err == nil {
-			w.Write([]byte(cachedData))
-			return
-		} else if cachedData != "" { // проверить ошибки
-			http.Error(w, "Ошибка при поиске данных в кеше", http.StatusInternalServerError)
-			return
+		if isLast(r.URL.Query()) {
+			cachedData, err := c.Get(cacheKey(r))
+			if err == nil {
+				w.Write([]byte(cachedData))
+				return
+			} else if cachedData != "" { // отловить ошибку на пустоту
+				logger.Error("the cache is not get: %v", err)
+			}
 		}
 
 		next.ServeHTTP(w, r)
 
 		cached := w.(cacheWriter).Body()
-		err = c.Set(cacheKey(r), cached, 5*time.Minute)
+		err := c.Set(cacheKey(r), cached, 5*time.Minute)
 		if err != nil {
-			logger.Error("cookies do not contain a token: %v", err)
-			fmt.Println("Ошибка при сохранении данных в кеше:", err)
+			logger.Error("the cache is not saved: %v", err)
 		}
 	})
 }
