@@ -12,7 +12,7 @@ import (
 	"github.com/pressly/goose"
 )
 
-func Connection(databaseDSN string) (*sql.DB, error) {
+func connection(databaseDSN string) (*sql.DB, error) {
 	db, err := sql.Open("pgx", databaseDSN)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open DataBase: %w", err)
@@ -22,7 +22,7 @@ func Connection(databaseDSN string) (*sql.DB, error) {
 }
 
 func newStorage(conf *config.Storage) (*storageData, error) {
-	db, err := Connection(conf.DatabaseDSN)
+	db, err := connection(conf.DatabaseDSN)
 	if err != nil {
 		return nil, fmt.Errorf("cannot connection database: %w", err)
 	}
@@ -36,7 +36,7 @@ func newStorage(conf *config.Storage) (*storageData, error) {
 	return &storageData{db: db}, nil
 }
 
-func InitStorage(conf *config.Storage) (Storage, error) {
+func Init(conf *config.Storage) (Storage, error) {
 	st, err := newStorage(conf)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create data base: %w", err)
