@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Logger struct {
@@ -26,11 +27,22 @@ type Caches struct {
 	Url string
 }
 
+type TokenTime struct {
+	TokenEXP time.Duration
+	Time     int
+}
+
+type Token struct {
+	TokenTime
+	TokenSecretKey string
+}
+
 type Flags struct {
 	Logger
 	NetAddress
 	Storage
 	Caches
+	Token
 }
 
 func (a NetAddress) String() string {
